@@ -1,0 +1,41 @@
+# Test duties (STANDARDS spec section 3), identical for all projects; the profile decides from which level a duty applies.
+schema: forge-standards/testing/v1
+version: "0.1.0"
+status: proposed
+name: testing
+levels:
+  - {id: unit, purpose: "isolated logic, fast (< 2 min total)", required_from: spike, runs_in: "CI every push", evidence: "junit.xml, pass/fail/skip counts"}
+  - {id: integration, purpose: "real DB/containers, no fakes at system boundaries that hide behaviour", required_from: standard, runs_in: "CI PR", evidence: "junit + container digests"}
+  - {id: e2e, purpose: "user path through the system (brief -> run -> report)", required_from: produktion, runs_in: "CI PR on merge candidate", evidence: "log + artifact hash"}
+  - {id: smoke, purpose: "health/ping after deploy, expectation defined beforehand", required_from: standard, runs_in: "after deploy", evidence: "status code, commit from health"}
+  - {id: live_proof, purpose: "acceptance against the real system with expectations fixed beforehand", required_from: produktion, runs_in: "after merge/deploy, owner approval + cost cap where needed", evidence: "raw output verbatim, redacted"}
+  - {id: goldset, purpose: "fixed cases with expected output (F4 goldset: 20 questions >= 80 %)", required_from: produktion, runs_in: "CI nightly and on change in the path", evidence: "hit rate per case"}
+  - {id: property_fuzz, purpose: "invariants, parsers, crypto, money arithmetic", required_from: kritisch, runs_in: "CI nightly", evidence: "seeds, minimal example"}
+dictated_tests:
+  rule: "From `standard` upward every brief carries tests.yaml: name (snake_case), level, input/mutation, expect (exact value/error/state), proves (spec/criterion line). The coder adds only harness helpers and reports every extra test by name."
+failing_first:
+  rule: "Failing-first: a new test must be red on the base commit at its main assert (proof: run ID on base SHA) with controls green. Exception: pure new creation without prior state (then a mutation sample is mandatory)."
+mutation_sample:
+  rule: "The reviewer mutates at least 1 (standard) / 3 (produktion) / all critical branches (kritisch) places in the changed code and proves a test goes red. Tool mutation score (mutmut/Stryker/cargo-mutants) only for produktion/kritisch."
+legacy_tests:
+  rule: "Expectations that may flip are named individually and as a class in the brief."
+never:
+  rule: "Never: skip, xfail, @pytest.mark.skip, #[ignore], it.skip, lowering a threshold, reducing iterations, continue-on-error on gates (G3). CI counts skipped > 0 in gate jobs as FAIL. Platform skips only through the central list .forge/skips.yaml with owner/planner decision and expiry date."
+flake_policy:
+  rule: "A flake is a finding. At most 1 automatic retry per job, reported as flaky; a second flake of the same test opens a defect entry plus a read-only diagnosis order. Quarantine only in standard/spike, at most 7 days, never in kritisch."
+measurement_runs:
+  rule: "Sample size in the brief, against a booked reference; repeat only with a new reason."
+ci_gate:
+  rule: "A merge candidate is green when, on the same head SHA, all required jobs of the profile are success, none skipped/cancelled, no continue-on-error in gate jobs (workflow file checked at the pin), a push and a PR run exist, and the review verdict PASS is on line 1."
+evidence_block: |
+  ## Evidence
+  base_sha / head_sha / tree    : <40hex> / <40hex> / <40hex>
+  model / effort / session      : claude-sonnet-5-5 / medium / fresh|continued
+  tests                         : unit 120/120 · integ 18/18 · e2e 3/3 · skipped 0 · flaky 0
+  dictated_tests                : 12/12 present, 12 pass, failing-first runs: <run-id on base>
+  coverage (diff / total)       : 91 % / 78 %      mutation: 4/4 killed (list)
+  ci_runs                       : push <id> success · pr <id> success
+  diff                          : <N files, full content below>   secrets_scan: gitleaks 0 findings
+assumptions:
+  - never.rule
+  - flake_policy.rule

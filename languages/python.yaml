@@ -1,0 +1,14 @@
+# Layer 2 - language "python" (STANDARDS spec section 4). Open question 4 default applied: mypy --strict, pyright only on demand.
+schema: forge-standards/language/v1
+version: "0.1.0"
+status: proposed
+name: python
+display: "Python >= 3.12"
+applies_to: ["*.py", "pyproject.toml", "uv.lock"]
+formatter: "ruff format"
+linter: "ruff check (E,F,W,I,B,UP,S,SIM,PL,RUF)"
+types: "mypy --strict for src/ (pyright strict only on demand)"
+required: ["uv + uv.lock", "pytest", "pip-audit"]
+notation: ["snake_case / PascalCase / UPPER_CASE", "small modules", "no silent except:", "Google-style docstrings"]
+config_files: [configs/ruff.toml]
+assumptions: [types]

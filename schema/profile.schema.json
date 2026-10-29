@@ -1,0 +1,610 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge-standards/schema/profile.schema.json",
+  "title": "Coding profile (layer 1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "status",
+    "name",
+    "use",
+    "coder",
+    "review",
+    "tests",
+    "gates",
+    "budget",
+    "context",
+    "docs",
+    "deploy",
+    "lifetime_days",
+    "restrictions",
+    "assumptions"
+  ],
+  "properties": {
+    "schema": {
+      "const": "forge-standards/profile/v1"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "status": {
+      "enum": [
+        "proposed",
+        "approved",
+        "superseded"
+      ]
+    },
+    "name": {
+      "enum": [
+        "spike",
+        "standard",
+        "produktion",
+        "kritisch"
+      ]
+    },
+    "use": {
+      "type": "string",
+      "minLength": 3
+    },
+    "coder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executor",
+        "model",
+        "effort",
+        "alternatives",
+        "docs"
+      ],
+      "properties": {
+        "executor": {
+          "enum": [
+            "claude",
+            "codex",
+            "claudegw",
+            "local"
+          ]
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model_with_full_oracle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effort": {
+          "enum": [
+            "minimal",
+            "low",
+            "medium",
+            "high",
+            "xhigh"
+          ]
+        },
+        "escalation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "model",
+            "after_rounds"
+          ],
+          "properties": {
+            "model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "after_rounds": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "docs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "executor",
+            "model",
+            "effort"
+          ],
+          "properties": {
+            "executor": {
+              "enum": [
+                "claude",
+                "codex",
+                "claudegw",
+                "local"
+              ]
+            },
+            "model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "effort": {
+              "enum": [
+                "minimal",
+                "low",
+                "medium",
+                "high",
+                "xhigh"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "executor",
+        "model",
+        "effort",
+        "when",
+        "judge",
+        "external_second_round"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "single_cross_model",
+            "cross_model"
+          ]
+        },
+        "executor": {
+          "enum": [
+            "claude",
+            "codex",
+            "claudegw"
+          ]
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effort": {
+          "enum": [
+            "minimal",
+            "low",
+            "medium",
+            "high",
+            "xhigh"
+          ],
+          "x-strict": {
+            "kind": "ordered",
+            "order": [
+              "minimal",
+              "low",
+              "medium",
+              "high",
+              "xhigh"
+            ]
+          }
+        },
+        "when": {
+          "enum": [
+            "before_merge_to_main",
+            "every_pr"
+          ]
+        },
+        "judge": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "model",
+            "effort"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "none",
+                "on_dissent",
+                "always"
+              ],
+              "x-strict": {
+                "kind": "ordered",
+                "order": [
+                  "none",
+                  "on_dissent",
+                  "always"
+                ]
+              }
+            },
+            "model": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "effort": {
+              "enum": [
+                "minimal",
+                "low",
+                "medium",
+                "high",
+                "xhigh",
+                null
+              ]
+            }
+          }
+        },
+        "external_second_round": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_true"
+          }
+        }
+      }
+    },
+    "tests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "levels_required",
+        "dictated_core_tests_only",
+        "diff_coverage_min",
+        "mutation_score_min",
+        "mutation_sample_min",
+        "failing_first",
+        "property_fuzz"
+      ],
+      "properties": {
+        "levels_required": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "unit",
+              "integration",
+              "e2e",
+              "smoke",
+              "live_proof",
+              "goldset",
+              "property_fuzz",
+              "guard_tests"
+            ]
+          },
+          "uniqueItems": true,
+          "x-strict": {
+            "kind": "superset"
+          }
+        },
+        "dictated_core_tests_only": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_false"
+          }
+        },
+        "diff_coverage_min": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "x-strict": {
+            "kind": "max"
+          },
+          "maximum": 100
+        },
+        "mutation_score_min": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "x-strict": {
+            "kind": "max"
+          },
+          "maximum": 100
+        },
+        "mutation_sample_min": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "x-strict": {
+            "kind": "max"
+          }
+        },
+        "mutation_all_critical_branches": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_true"
+          }
+        },
+        "failing_first": {
+          "enum": [
+            "dictated_tests_only",
+            "required_with_exceptions",
+            "required_no_exceptions"
+          ],
+          "x-strict": {
+            "kind": "ordered",
+            "order": [
+              "dictated_tests_only",
+              "required_with_exceptions",
+              "required_no_exceptions"
+            ]
+          }
+        },
+        "property_fuzz": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_true"
+          }
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "merge_approval",
+        "owner_approval_for"
+      ],
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "x-strict": {
+            "kind": "superset"
+          }
+        },
+        "merge_approval": {
+          "enum": [
+            "planner_go",
+            "planner_go_judge_pass",
+            "owner"
+          ],
+          "x-strict": {
+            "kind": "ordered",
+            "order": [
+              "planner_go",
+              "planner_go_judge_pass",
+              "owner"
+            ]
+          }
+        },
+        "owner_approval_for": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "x-strict": {
+            "kind": "superset"
+          }
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "api_usd_month",
+        "subscription_share_min",
+        "hard",
+        "owner_info_usd_per_run"
+      ],
+      "properties": {
+        "api_usd_month": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-strict": {
+            "kind": "min"
+          }
+        },
+        "subscription_share_min": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-strict": {
+            "kind": "max"
+          },
+          "maximum": 1
+        },
+        "hard": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_true"
+          }
+        },
+        "owner_info_usd_per_run": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "x-strict": {
+            "kind": "min"
+          }
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "brief_tokens",
+        "package_tokens",
+        "spec_excerpt_tokens",
+        "fresh_session_per_unit"
+      ],
+      "properties": {
+        "brief_tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "x-strict": {
+            "kind": "min"
+          }
+        },
+        "package_tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "x-strict": {
+            "kind": "min"
+          }
+        },
+        "spec_excerpt_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fresh_session_per_unit": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_true"
+          }
+        },
+        "review_fresh_session": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_true"
+          }
+        }
+      }
+    },
+    "docs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required"
+      ],
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "x-strict": {
+            "kind": "superset"
+          }
+        }
+      }
+    },
+    "deploy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approval",
+        "smoke",
+        "health_commit_pin",
+        "canary_or_parallel",
+        "rollback_tested",
+        "kill_switch",
+        "stages"
+      ],
+      "properties": {
+        "approval": {
+          "enum": [
+            "none",
+            "planner_go",
+            "owner_per_stage"
+          ],
+          "x-strict": {
+            "kind": "ordered",
+            "order": [
+              "none",
+              "planner_go",
+              "owner_per_stage"
+            ]
+          }
+        },
+        "smoke": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_true"
+          }
+        },
+        "health_commit_pin": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_true"
+          }
+        },
+        "canary_or_parallel": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_true"
+          }
+        },
+        "rollback_tested": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_true"
+          }
+        },
+        "kill_switch": {
+          "type": "boolean",
+          "x-strict": {
+            "kind": "bool_true"
+          }
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "x-strict": {
+            "kind": "superset"
+          }
+        }
+      }
+    },
+    "lifetime_days": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1,
+      "x-strict": {
+        "kind": "min"
+      }
+    },
+    "restrictions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "x-strict": {
+        "kind": "superset"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}

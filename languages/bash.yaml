@@ -1,0 +1,14 @@
+# Layer 2 - language "bash" (STANDARDS spec section 4).
+schema: forge-standards/language/v1
+version: "0.1.0"
+status: proposed
+name: bash
+display: "Bash"
+applies_to: ["*.sh", "*.bash"]
+formatter: "shfmt -i 2 -ci"
+linter: "shellcheck -S style"
+types: null
+required: ["set -euo pipefail", "absolute paths in ops blocks"]
+notation: ["secrets never as argument/variable (G12)", "never source env files"]
+config_files: [configs/.shellcheckrc]
+assumptions: []

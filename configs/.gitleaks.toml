@@ -1,0 +1,5 @@
+# gitleaks: default ruleset plus nothing weakened; allowlists need an expiring entry in the project's .forge/project.yaml.
+title = "forge-standards gitleaks"
+
+[extend]
+useDefault = true

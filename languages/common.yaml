@@ -1,0 +1,18 @@
+# Layer 2 - rules for all languages (STANDARDS spec section 4, bullet list). Open question 5 default applied: Conventional Commits in English for all repos, old history stays.
+schema: forge-standards/language/v1
+version: "0.1.0"
+status: proposed
+name: common
+display: "All languages"
+applies_to: ["*"]
+formatter: null
+linter: "gitleaks pre-commit + CI (full history for a new repo; a finding is a BLOCKER)"
+types: null
+required: ["lockfile mandatory", "images by digest", "upgrades in their own PR", "main only via PR with branch protection, no force-push or tags by agents"]
+notation:
+  - "comments/docstrings/identifiers/commits/repo docs in English; comments explain why, not what"
+  - "commits: feat|fix|test|docs|refactor|chore|ci(scope): imperative summary; body names brief ID and finding IDs; Co-Authored-By trailer of the model"
+  - "branch <k>/<topic>; PR text = evidence block; merge --no-ff or squash after GO"
+  - "no key-value secret patterns in plain text in docs"
+config_files: [configs/.gitleaks.toml]
+assumptions: [notation]

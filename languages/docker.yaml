@@ -1,0 +1,14 @@
+# Layer 2 - language "docker" (Dockerfile/Compose; STANDARDS spec section 4).
+schema: forge-standards/language/v1
+version: "0.1.0"
+status: proposed
+name: docker
+display: "Dockerfile/Compose"
+applies_to: ["Dockerfile", "Dockerfile.*", "*.dockerfile", "compose.y*ml", "docker-compose*.y*ml"]
+formatter: null
+linter: "hadolint, docker compose config"
+types: null
+required: ["base image by digest", "images.lock", "/healthz and /readyz", "labels app.kubernetes.io/*", "no `version:` key"]
+notation: ["one process per container"]
+config_files: [configs/.hadolint.yaml]
+assumptions: []

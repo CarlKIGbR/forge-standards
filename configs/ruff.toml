@@ -1,0 +1,13 @@
+# Python >= 3.12; rule families from STANDARDS spec section 4: E,F,W,I,B,UP,S,SIM,PL,RUF.
+target-version = "py312"
+line-length = 120
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "PL", "RUF"]
+
+[lint.per-file-ignores]
+# G3: no blanket ignores. Asserts are the point of tests, so S101 is the one scoped exception; it is not a weakened check.
+"tests/**/*.py" = ["S101"]
+
+[format]
+quote-style = "double"

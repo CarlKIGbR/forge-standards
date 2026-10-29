@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge-standards/schema/language.schema.json",
+  "title": "Language standard (layer 2)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "status",
+    "name",
+    "display",
+    "applies_to",
+    "formatter",
+    "linter",
+    "types",
+    "required",
+    "notation",
+    "config_files",
+    "assumptions"
+  ],
+  "properties": {
+    "schema": {
+      "const": "forge-standards/language/v1"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "status": {
+      "enum": [
+        "proposed",
+        "approved",
+        "superseded"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z]+$"
+    },
+    "display": {
+      "type": "string",
+      "minLength": 1
+    },
+    "applies_to": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "formatter": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "linter": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "types": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "required": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "notation": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "config_files": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^configs/[^/]+$"
+      },
+      "uniqueItems": true
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}

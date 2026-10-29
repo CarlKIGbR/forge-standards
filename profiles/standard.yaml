@@ -1,0 +1,58 @@
+# Layer 1 - profile "standard" (STANDARDS spec section 5).
+schema: forge-standards/profile/v1
+version: "0.1.0"
+status: proposed
+name: standard
+use: "Internal tools, not operated permanently."
+coder:
+  executor: claude
+  model: claude-sonnet-5-5
+  effort: medium
+  alternatives: []
+  docs: {executor: claude, model: claude-haiku-4-5, effort: low}
+review:
+  mode: cross_model
+  executor: codex
+  model: gpt-6.1-sol
+  effort: medium
+  when: every_pr
+  judge: {mode: none, model: null, effort: null}
+  external_second_round: false
+tests:
+  levels_required: [unit, integration, smoke]
+  dictated_core_tests_only: false
+  diff_coverage_min: 70
+  mutation_score_min: null
+  mutation_sample_min: 1
+  failing_first: required_with_exceptions
+  property_fuzz: false
+gates:
+  required: [lint, format, gitleaks, ci_gate, review_pass]
+  merge_approval: planner_go
+  owner_approval_for: []
+budget:
+  api_usd_month: 50
+  subscription_share_min: 0.85
+  hard: false
+  owner_info_usd_per_run: null
+context:
+  brief_tokens: 4000
+  package_tokens: 6000
+  spec_excerpt_tokens: 0
+  fresh_session_per_unit: false
+docs:
+  required: [readme, adr_per_architecture_decision, changelog]
+deploy:
+  approval: planner_go
+  smoke: true
+  health_commit_pin: false
+  canary_or_parallel: false
+  rollback_tested: false
+  kill_switch: false
+  stages: []
+lifetime_days: null
+restrictions: []
+assumptions:
+  - tests.diff_coverage_min
+  - budget.api_usd_month
+  - budget.subscription_share_min

@@ -1,0 +1,14 @@
+# Layer 2 - language "typescript" (STANDARDS spec section 4).
+schema: forge-standards/language/v1
+version: "0.1.0"
+status: proposed
+name: typescript
+display: "TypeScript/JS"
+applies_to: ["*.ts", "*.tsx", "*.js", "*.mjs", "*.cjs", "package.json", "pnpm-lock.yaml"]
+formatter: "prettier"
+linter: "eslint (typescript-eslint strict)"
+types: "tsc --noEmit --strict"
+required: ["pnpm-lock.yaml", "npm audit / osv-scanner"]
+notation: ["camelCase, types PascalCase", "no `any` without a comment"]
+config_files: [configs/eslint.config.js]
+assumptions: []

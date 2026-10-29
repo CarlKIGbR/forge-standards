@@ -1,0 +1,61 @@
+# Layer 1 - profile "spike" (STANDARDS spec section 5). Values marked in `assumptions` are ANNAHME from the spec, pending owner confirmation.
+schema: forge-standards/profile/v1
+version: "0.1.0"
+status: proposed
+name: spike
+use: "Prototype, experiment, throw-away code, eval."
+coder:
+  executor: claude
+  model: claude-haiku-4-5
+  effort: low
+  alternatives: ["local", "glm-5.3 via claudegw", "deepseek-v4.1-flash via claudegw"]
+  docs: {executor: claude, model: claude-haiku-4-5, effort: low}
+review:
+  mode: single_cross_model
+  executor: codex
+  model: gpt-6.1-sol
+  effort: medium
+  when: before_merge_to_main
+  judge: {mode: none, model: null, effort: null}
+  external_second_round: false
+tests:
+  levels_required: [unit, smoke]
+  dictated_core_tests_only: true
+  diff_coverage_min: null
+  mutation_score_min: null
+  mutation_sample_min: 0
+  failing_first: dictated_tests_only
+  property_fuzz: false
+gates:
+  required: [lint, format, gitleaks]
+  merge_approval: planner_go
+  owner_approval_for: []
+budget:
+  api_usd_month: 20
+  subscription_share_min: 0.90
+  hard: false
+  owner_info_usd_per_run: null
+context:
+  brief_tokens: 2000
+  package_tokens: 2000
+  spec_excerpt_tokens: 0
+  fresh_session_per_unit: false
+docs:
+  required: [readme_purpose_start_expiry]
+deploy:
+  approval: none
+  smoke: false
+  health_commit_pin: false
+  canary_or_parallel: false
+  rollback_tested: false
+  kill_switch: false
+  stages: []
+lifetime_days: 30
+restrictions: []
+assumptions:
+  - tests.failing_first
+  - budget.api_usd_month
+  - budget.subscription_share_min
+  - context.brief_tokens
+  - context.package_tokens
+  - lifetime_days

@@ -1,0 +1,62 @@
+# Layer 1 - profile "kritisch" (STANDARDS spec section 5). Open question 3 default applied: planner GO + judge PASS merges; owner only for G11 topics.
+schema: forge-standards/profile/v1
+version: "0.1.0"
+status: proposed
+name: kritisch
+use: "Money, broker, crypto/security, customer data."
+coder:
+  executor: claude
+  model: claude-opus-5-5
+  model_with_full_oracle: claude-sonnet-5-5
+  effort: high
+  alternatives: []
+  docs: {executor: claude, model: claude-haiku-4-5, effort: low}
+review:
+  mode: cross_model
+  executor: codex
+  model: gpt-6-astra
+  effort: xhigh
+  when: every_pr
+  judge: {mode: always, model: claude-opus-5-5, effort: high}
+  external_second_round: true
+tests:
+  levels_required: [unit, integration, e2e, smoke, live_proof, goldset, property_fuzz, guard_tests]
+  dictated_core_tests_only: false
+  diff_coverage_min: 95
+  mutation_score_min: 80
+  mutation_sample_min: 3
+  mutation_all_critical_branches: true
+  failing_first: required_no_exceptions
+  property_fuzz: true
+gates:
+  required: [lint, format, gitleaks, ci_gate, review_pass, live_proof, judge_pass]
+  merge_approval: planner_go_judge_pass
+  owner_approval_for: [live, money, secrets, github_settings, tags, paper_shadow_live_stage, spec_change, threat_model_change, freeze]
+budget:
+  api_usd_month: 300
+  subscription_share_min: null
+  hard: false
+  owner_info_usd_per_run: 10
+context:
+  brief_tokens: 4000
+  package_tokens: 6000
+  spec_excerpt_tokens: 4000
+  fresh_session_per_unit: true
+  review_fresh_session: true
+docs:
+  required: [readme, adr_per_architecture_decision, changelog, runbook, operations_data_map, defect_list, threat_model, milestone_review, evidence_folder]
+deploy:
+  approval: owner_per_stage
+  smoke: true
+  health_commit_pin: true
+  canary_or_parallel: true
+  rollback_tested: true
+  kill_switch: true
+  stages: [paper, shadow, live]
+lifetime_days: null
+restrictions: [no_cn_apis_with_customer_data]
+assumptions:
+  - tests.diff_coverage_min
+  - tests.mutation_score_min
+  - context.spec_excerpt_tokens
+  - deploy.kill_switch

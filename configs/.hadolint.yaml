@@ -1,0 +1,7 @@
+# hadolint: no ignores (G3); base images must be pinned by digest (G20).
+failure-threshold: style
+trustedRegistries: []
+strict-labels: true
+label-schema:
+  app.kubernetes.io/name: text
+  app.kubernetes.io/part-of: text

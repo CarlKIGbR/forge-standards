@@ -1,0 +1,61 @@
+# Layer 1 - profile "produktion" (STANDARDS spec section 5).
+schema: forge-standards/profile/v1
+version: "0.1.0"
+status: proposed
+name: produktion
+use: "Operated services, customer impact, infrastructure."
+coder:
+  executor: claude
+  model: claude-sonnet-5-5
+  effort: medium
+  escalation: {model: claude-opus-5-5, after_rounds: 2}
+  alternatives: []
+  docs: {executor: claude, model: claude-haiku-4-5, effort: low}
+review:
+  mode: cross_model
+  executor: codex
+  model: gpt-6.1-sol
+  effort: high
+  when: every_pr
+  judge: {mode: on_dissent, model: claude-opus-5-5, effort: high}
+  external_second_round: false
+tests:
+  levels_required: [unit, integration, e2e, smoke, live_proof, goldset]
+  dictated_core_tests_only: false
+  diff_coverage_min: 85
+  mutation_score_min: 60
+  mutation_sample_min: 3
+  failing_first: required_with_exceptions
+  property_fuzz: false
+gates:
+  required: [lint, format, gitleaks, ci_gate, review_pass, live_proof]
+  merge_approval: planner_go
+  owner_approval_for: [freeze, maintenance_window]
+budget:
+  api_usd_month: 150
+  subscription_share_min: 0.75
+  hard: false
+  owner_info_usd_per_run: null
+context:
+  brief_tokens: 4000
+  package_tokens: 6000
+  spec_excerpt_tokens: 0
+  fresh_session_per_unit: false
+  review_fresh_session: true
+docs:
+  required: [readme, adr_per_architecture_decision, changelog, runbook, operations_data_map, defect_list]
+deploy:
+  approval: planner_go
+  smoke: true
+  health_commit_pin: true
+  canary_or_parallel: true
+  rollback_tested: true
+  kill_switch: false
+  stages: []
+lifetime_days: null
+restrictions: []
+assumptions:
+  - tests.diff_coverage_min
+  - tests.mutation_score_min
+  - budget.api_usd_month
+  - budget.subscription_share_min

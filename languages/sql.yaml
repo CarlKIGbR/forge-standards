@@ -1,0 +1,14 @@
+# Layer 2 - language "sql" (STANDARDS spec section 4).
+schema: forge-standards/language/v1
+version: "0.1.0"
+status: proposed
+name: sql
+display: "SQL (PostgreSQL)"
+applies_to: ["*.sql"]
+formatter: "sqlfluff fix (dialect postgres)"
+linter: "sqlfluff lint"
+types: null
+required: ["numbered migrations", "forward-only", "idempotent"]
+notation: ["snake_case, plural table names", "schemas core / mem"]
+config_files: [configs/.sqlfluff]
+assumptions: []
