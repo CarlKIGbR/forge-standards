@@ -1,6 +1,6 @@
 # Layer 0 - owner principles. Only the owner changes this file. No override may touch any key below (STANDARDS spec section 1).
 schema: forge-standards/owner/v1
-version: "0.1.0"
+version: "0.1.1"
 status: proposed
 principles:
   - id: G1

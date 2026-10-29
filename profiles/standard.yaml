@@ -1,6 +1,6 @@
 # Layer 1 - profile "standard" (STANDARDS spec section 5).
 schema: forge-standards/profile/v1
-version: "0.1.0"
+version: "0.1.1"
 status: proposed
 name: standard
 use: "Internal tools, not operated permanently."

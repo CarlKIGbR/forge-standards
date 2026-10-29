@@ -1,6 +1,6 @@
 # Layer 1 - profile "spike" (STANDARDS spec section 5). Values marked in `assumptions` are ANNAHME from the spec, pending owner confirmation.
 schema: forge-standards/profile/v1
-version: "0.1.0"
+version: "0.1.1"
 status: proposed
 name: spike
 use: "Prototype, experiment, throw-away code, eval."

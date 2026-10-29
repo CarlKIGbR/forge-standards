@@ -1,6 +1,6 @@
 # Layer 1 - profile "kritisch" (STANDARDS spec section 5). Open question 3 default applied: planner GO + judge PASS merges; owner only for G11 topics.
 schema: forge-standards/profile/v1
-version: "0.1.0"
+version: "0.1.1"
 status: proposed
 name: kritisch
 use: "Money, broker, crypto/security, customer data."

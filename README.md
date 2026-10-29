@@ -3,7 +3,7 @@
 Declarative, versioned standards and coding profiles for the AI Forge. Git is canonical; the Forge database (`core.standards`, `core.profiles`) and
 the memory (`mem.documents`, `source_kind = standard`) are read copies written by `python -m forge_core.standards sync`.
 
-**Status of this release: `v0.1.0` — `proposed`. Owner approval is pending.** Every file carries `status: proposed`. Values that the source specification
+**Status of this release: `v0.1.1` — `proposed`. Owner approval is pending.** Every file carries `status: proposed`. Values that the source specification
 marks as `ANNAHME` (assumption) are applied as written and listed per profile under `assumptions:`; they are to be confirmed or corrected by the owner.
 
 ## Layers (precedence top to bottom)
@@ -25,8 +25,9 @@ owner/       grundsaetze.yaml  grundsaetze.md          principles G1-G25 (`short
 profiles/    spike standard produktion kritisch .yaml    coder/review/judge, tests + thresholds, gates, budget, context, docs, deploy
 languages/   python typescript bash sql docker rust common .yaml
 testing/     standard.yaml                               test duties for all projects (levels, failing-first, mutation sample, flake policy, CI gate)
+manifest.yaml                                                list of required files
 configs/     ruff.toml .shellcheckrc .sqlfluff .hadolint.yaml .gitleaks.toml eslint.config.js
-schema/      owner profile language testing project .schema.json   JSON Schema (draft 2020-12), one per file kind
+schema/      owner profile language testing project manifest .schema.json   JSON Schema (draft 2020-12), one per file kind
 ```
 
 ## Validation
@@ -40,9 +41,9 @@ python -m forge_core.standards validate <checkout-of-this-repo>     # in the for
 
 ## Versioning
 
-SemVer tags (`v0.1.0`, ...); the `version` inside each file must equal the tag. Projects pin `standards_version`; an upgrade is one PR per project.
+SemVer tags (`v0.1.0`, `v0.1.1`, ...); the `version` inside each file must equal the tag. Projects pin `standards_version`; an upgrade is one PR per project.
 
-## Owner questions (section 7 of the spec) — defaults applied in v0.1.0
+## Owner questions (section 7 of the spec) — defaults applied in v0.1.1
 
 1. Thresholds: diff coverage 70/85/95 % and mutation score 60/80 % for standard/produktion/kritisch; to be tuned after 4 weeks of measurement.
 2. Monthly API budgets 20/50/150/300 USD per profile as **soft** limits with owner info (`budget.hard: false`); hard only after measurement.
@@ -50,6 +51,11 @@ SemVer tags (`v0.1.0`, ...); the `version` inside each file must equal the tag. 
 4. Python type checker: `mypy --strict` (pyright only on demand).
 5. Conventional Commits in English for all repos; old history stays.
 6. Visibility: private; only the forge GitHub App reads.
+
+## Required-file manifest
+
+`manifest.yaml` lists every file that must exist at a tag (`required_files`). A checkout missing any listed file, or a manifest that drops a core file,
+fails validation before anything is written. Change log: v0.1.1 adds the manifest (the v0.1.0 checker accepted incomplete checkouts).
 
 ## Not in this release
 

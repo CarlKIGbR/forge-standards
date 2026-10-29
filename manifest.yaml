@@ -1,0 +1,32 @@
+# Every file that must exist at a tag. Validation fails (before any write) when one is missing. The manifest itself is implied.
+schema: forge-standards/manifest/v1
+version: "0.1.1"
+status: proposed
+required_files:
+  - README.md
+  - configs/.gitleaks.toml
+  - configs/.hadolint.yaml
+  - configs/.shellcheckrc
+  - configs/.sqlfluff
+  - configs/eslint.config.js
+  - configs/ruff.toml
+  - languages/bash.yaml
+  - languages/common.yaml
+  - languages/docker.yaml
+  - languages/python.yaml
+  - languages/rust.yaml
+  - languages/sql.yaml
+  - languages/typescript.yaml
+  - owner/grundsaetze.md
+  - owner/grundsaetze.yaml
+  - profiles/kritisch.yaml
+  - profiles/produktion.yaml
+  - profiles/spike.yaml
+  - profiles/standard.yaml
+  - schema/language.schema.json
+  - schema/manifest.schema.json
+  - schema/owner.schema.json
+  - schema/profile.schema.json
+  - schema/project.schema.json
+  - schema/testing.schema.json
+  - testing/standard.yaml
