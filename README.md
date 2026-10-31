@@ -3,7 +3,7 @@
 Declarative, versioned standards and coding profiles for the AI Forge. Git is canonical; the Forge database (`core.standards`, `core.profiles`) and
 the memory (`mem.documents`, `source_kind = standard`) are read copies written by `python -m forge_core.standards sync`.
 
-**Status of this release: `v0.1.1` — `proposed`. Owner approval is pending.** Every file carries `status: proposed`. Values that the source specification
+**Status of this release: `v0.2.0` — `proposed`. G27/G28 are owner-approved (Owner-Freigabe 2026-10-31); approval of the release as a whole is pending.** Every file carries `status: proposed`. Values that the source specification
 marks as `ANNAHME` (assumption) are applied as written and listed per profile under `assumptions:`; they are to be confirmed or corrected by the owner.
 
 ## Layers (precedence top to bottom)
@@ -21,11 +21,13 @@ Strictness per key is declared in `schema/profile.schema.json` (`x-strict`); a k
 ## Layout
 
 ```
-owner/       grundsaetze.yaml  grundsaetze.md          principles G1-G25 (`short` form is what briefs carry)
+owner/       grundsaetze.yaml  grundsaetze.md          principles G1-G28, cap <=30 (`short` form is what briefs carry)
 profiles/    spike standard produktion kritisch .yaml    coder/review/judge, tests + thresholds, gates, budget, context, docs, deploy
 languages/   python typescript bash sql docker rust common .yaml
 testing/     standard.yaml                               test duties for all projects (levels, failing-first, mutation sample, flake policy, CI gate)
 manifest.yaml                                                list of required files
+docs/        review-checklist.md                     reviewer checklist items (profile `review.checklist_*`)
+testkit/     g27_entrypoints.py g28_race.py ...      reusable Python test helpers for G27/G28 + self-test (see testkit/README.md)
 configs/     ruff.toml .shellcheckrc .sqlfluff .hadolint.yaml .gitleaks.toml eslint.config.js
 schema/      owner profile language testing project manifest .schema.json   JSON Schema (draft 2020-12), one per file kind
 ```
@@ -41,9 +43,9 @@ python -m forge_core.standards validate <checkout-of-this-repo>     # in the for
 
 ## Versioning
 
-SemVer tags (`v0.1.0`, `v0.1.1`, ...); the `version` inside each file must equal the tag. Projects pin `standards_version`; an upgrade is one PR per project.
+SemVer tags (`v0.1.0`, `v0.1.1`, `v0.2.0`, ...); the `version` inside each file must equal the tag. Projects pin `standards_version`; an upgrade is one PR per project.
 
-## Owner questions (section 7 of the spec) — defaults applied in v0.1.1
+## Owner questions (section 7 of the spec) — defaults applied since v0.1.1
 
 1. Thresholds: diff coverage 70/85/95 % and mutation score 60/80 % for standard/produktion/kritisch; to be tuned after 4 weeks of measurement.
 2. Monthly API budgets 20/50/150/300 USD per profile as **soft** limits with owner info (`budget.hard: false`); hard only after measurement.
@@ -55,7 +57,11 @@ SemVer tags (`v0.1.0`, `v0.1.1`, ...); the `version` inside each file must equal
 ## Required-file manifest
 
 `manifest.yaml` lists every file that must exist at a tag (`required_files`). A checkout missing any listed file, or a manifest that drops a core file,
-fails validation before anything is written. Change log: v0.1.1 adds the manifest (the v0.1.0 checker accepted incomplete checkouts).
+fails validation before anything is written. 
+
+## Change log
+
+See `CHANGELOG.md`.
 
 ## Not in this release
 

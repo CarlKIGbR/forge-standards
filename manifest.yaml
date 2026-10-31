@@ -1,8 +1,9 @@
 # Every file that must exist at a tag. Validation fails (before any write) when one is missing. The manifest itself is implied.
 schema: forge-standards/manifest/v1
-version: "0.1.1"
+version: "0.2.0"
 status: proposed
 required_files:
+  - CHANGELOG.md
   - README.md
   - configs/.gitleaks.toml
   - configs/.hadolint.yaml
@@ -10,6 +11,7 @@ required_files:
   - configs/.sqlfluff
   - configs/eslint.config.js
   - configs/ruff.toml
+  - docs/review-checklist.md
   - languages/bash.yaml
   - languages/common.yaml
   - languages/docker.yaml
@@ -30,3 +32,7 @@ required_files:
   - schema/project.schema.json
   - schema/testing.schema.json
   - testing/standard.yaml
+  - testkit/README.md
+  - testkit/g27_entrypoints.py
+  - testkit/g28_race.py
+  - testkit/test_selftest.py

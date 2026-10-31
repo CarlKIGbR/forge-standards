@@ -28,7 +28,7 @@
     "principles": {
       "type": "array",
       "minItems": 1,
-      "maxItems": 25,
+      "maxItems": 30,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -41,7 +41,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^G([1-9]|1[0-9]|2[0-5])$"
+            "pattern": "^G([1-9]|1[0-9]|2[0-9]|30)$"
           },
           "short": {
             "type": "string",

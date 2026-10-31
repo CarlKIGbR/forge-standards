@@ -153,7 +153,9 @@
         "effort",
         "when",
         "judge",
-        "external_second_round"
+        "external_second_round",
+        "checklist_required",
+        "checklist_recommended"
       ],
       "properties": {
         "mode": {
@@ -244,6 +246,34 @@
           "type": "boolean",
           "x-strict": {
             "kind": "bool_true"
+          }
+        },
+        "checklist_required": {
+          "type": "array",
+          "description": "Review checklist items the reviewer must answer in the review report; a missing answer is a blocking finding. See docs/review-checklist.md.",
+          "items": {
+            "enum": [
+              "G27_entry_points",
+              "G28_fresh_evidence"
+            ]
+          },
+          "uniqueItems": true,
+          "x-strict": {
+            "kind": "superset"
+          }
+        },
+        "checklist_recommended": {
+          "type": "array",
+          "description": "Review checklist items the reviewer should answer; a missing answer is a non-blocking finding. See docs/review-checklist.md.",
+          "items": {
+            "enum": [
+              "G27_entry_points",
+              "G28_fresh_evidence"
+            ]
+          },
+          "uniqueItems": true,
+          "x-strict": {
+            "kind": "superset"
           }
         }
       }

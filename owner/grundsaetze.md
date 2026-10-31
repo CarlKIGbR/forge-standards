@@ -1,6 +1,6 @@
 # Owner principles (layer 0)
 
-Version 0.1.1 · status: proposed · generated from `grundsaetze.yaml`, do not edit by hand.
+Version 0.2.0 · status: proposed · generated from `grundsaetze.yaml`, do not edit by hand.
 
 ## G1 — Proof, not claims; unread stays unread
 
@@ -151,3 +151,15 @@ Sources: ARCH §0.1, nd Haltung, pd Haltung
 Rules grow only through measured observation; process errors are booked as lessons.
 
 Sources: cmp Pflege, as Anti-Muster
+
+## G27 — One guarded path: every register/publish/execute/release goes through all checks
+
+One protected path. Every function that registers, publishes, executes or releases runs through exactly one path that carries all checks (customer data, model locks, handle/session, budget). No optional parameter whose absence skips a check; missing state means reject (fail closed). One test counts all entry points and fails if any of them bypasses the protected path.
+
+Sources: F5c part 1, S2a, forge-node N1
+
+## G28 — Fresh evidence before irreversible decisions; races tested deterministically
+
+Evidence fresh before irreversible decisions. Before aborting, deleting, publishing or retrying, the state is re-observed immediately (file, log, archive, report, database); an older snapshot does not suffice. Concurrency is verified with deterministic race tests.
+
+Sources: F5c part 1, S2a, forge-node N1

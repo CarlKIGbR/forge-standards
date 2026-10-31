@@ -1,6 +1,6 @@
 # Layer 0 - owner principles. Only the owner changes this file. No override may touch any key below (STANDARDS spec section 1).
 schema: forge-standards/owner/v1
-version: "0.1.1"
+version: "0.2.0"
 status: proposed
 principles:
   - id: G1
@@ -134,3 +134,16 @@ principles:
     text: >-
       Rules grow only through measured observation; process errors are booked as lessons.
     sources: ["cmp Pflege", "as Anti-Muster"]
+  - id: G27
+    short: "One guarded path: every register/publish/execute/release goes through all checks"
+    text: >-
+      One protected path. Every function that registers, publishes, executes or releases runs through exactly one path that carries all checks
+      (customer data, model locks, handle/session, budget). No optional parameter whose absence skips a check; missing state means reject (fail closed).
+      One test counts all entry points and fails if any of them bypasses the protected path.
+    sources: ["F5c part 1", "S2a", "forge-node N1"]
+  - id: G28
+    short: "Fresh evidence before irreversible decisions; races tested deterministically"
+    text: >-
+      Evidence fresh before irreversible decisions. Before aborting, deleting, publishing or retrying, the state is re-observed immediately
+      (file, log, archive, report, database); an older snapshot does not suffice. Concurrency is verified with deterministic race tests.
+    sources: ["F5c part 1", "S2a", "forge-node N1"]
