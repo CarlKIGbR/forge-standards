@@ -1,0 +1,41 @@
+Head: a7f27da00501e97c9810feff509d85a482a9ff61
+(implementation commit; this report is committed on top of it - branch tip = `git rev-parse g27-g28`. Branch `g27-g28`, worktree `/srv/forge/work/forge-standards-g27g28`, base `main` 0899806 = v0.1.1. Not merged, not tagged: review + GO follow.)
+
+# G27 / G28 - forge-standards v0.2.0 (proposed)
+
+Owner-Freigabe 2026-10-31 for G27/G28. Written 2026-10-31 22:2x Berlin (outside the 02:00-05:45 window).
+
+## Changes
+
+1. **Owner principles** (`owner/grundsaetze.yaml`, `owner/grundsaetze.md` regenerated with forge-core's `render_owner_md`, byte-equal check passes)
+   - G27 "One guarded path" and G28 "Fresh evidence before irreversible decisions"; sources `["F5c part 1", "S2a", "forge-node N1"]` on both.
+   - Texts are an English rendering of the German wording (the file is English throughout; meaning kept, parenthesised check list kept: customer data, model locks, handle/session, budget).
+   - Cap: `schema/owner.schema.json` `maxItems` 25 -> 30 and id pattern `G1..G25` -> `G1..G30` (the id pattern was a second, hidden cap); README says "G1-G28, cap <=30". There was no other "<=25" text in the repo.
+2. **Profiles** - new keys `review.checklist_required` / `review.checklist_recommended` (schema: both required, items enum `G27_entry_points`/`G28_fresh_evidence`, strictness `superset`, so a project may add items freely and removing one counts as loosening: reason + expires).
+   - kritisch, produktion: required = both; standard: recommended = both; spike: both empty.
+   - Item text (reviewer must enumerate guarded entry points, name the guarded function and checks, list optional params; name the irreversible actions and the re-observation step before each, plus the race test): `docs/review-checklist.md`. Unanswered required item = blocking finding.
+3. **testkit/** (stdlib only, Python 3.11+): `g27_entrypoints.py` (AST entry-point enumeration, reachability to the single guarded function, optional/bypass-parameter detection, exact count, exemptions need a reason and must not be stale, guarded function must be defined exactly once, `assert_fail_closed` runtime check incl. "no side effect before rejection"; all args of the checker are required), `g28_race.py` (`Interleaver` park/release hooks with timeouts and no sleeps, `hook_after`/`hook_before`, cooperative `run_schedule`/`all_schedules`, `EvidenceLog`+`assert_observed_before` that also refuses a vacuous pass), `test_selftest.py` (18 tests), `README.md` with templates and limits.
+4. **Version 0.2.0** in every versioned file, `CHANGELOG.md` (new, also v0.1.1/v0.1.0 entries), README status/layout/versioning, `manifest.yaml` lists the 6 new files.
+5. Not changed: file `status` stays `proposed` (only G27/G28 are owner-approved, not the release as a whole); nothing in forge-core.
+
+## Test / CI results (observed, 22:20 Berlin)
+
+- Repo has no CI workflow (README: "Reusable CI workflows ... later steps"); the check is `python -m forge_core.standards validate`. forge-core's venv lacks `psycopg`, so I loaded `repo.py` directly (same code) via a script in /tmp.
+- **With unmodified forge-core: FAILS by design**: `manifest.yaml: version '0.2.0' is not a known standards line (this forge-core knows ['0.1']); upgrade forge-core first`. forge-core `INVENTORY` has only line "0.1" and the checker refuses to fall back. So v0.2.0 cannot be synced until forge-core gets a "0.2" line (follow-up 1). Hard blocker for tagging/syncing, not for review.
+- **With the 0.2 line added in memory only** (`INVENTORY["0.2"] = INVENTORY["0.1"]`): `validate_repo` returns `[]` (schemas, one version, assumptions resolve, md == rendering, manifest files exist).
+- Negative checks: unknown checklist id -> schema error; missing `checklist_recommended` -> "required property"; override that empties `review.checklist_required` on kritisch -> "loosening needs a reason" + "needs an expires date"; adding G27 to standard's list -> accepted (tightening). (`overrides.check_overrides` run with a stubbed psycopg.)
+- Testkit self-test: `python3 -I -m unittest discover -s testkit -v` -> **18 tests OK** (0.2 s). Mutation spot check by hand: making `_reaches` always true -> failure; disabling the "directly preceded by observe" test -> failure. This is a small sample, not a mutation run.
+- Brief excerpt budget: the 28 owner short lines are 489 est. tokens vs 442 for the 25 principles of v0.1.1 -> +47 of the 1200-token excerpt budget (`MAX_TOKENS`); forge-core's token estimator, not run through `excerpt()` (needs DB).
+- Not done: no tag, no sync, no real project run of the testkit against forge-core code (its entry points: see follow-up 6). Limits of the G27 helper (static, bare-name resolution, no dynamic dispatch) are in `testkit/README.md`.
+
+## Proposal only: forge-core follow-ups for standards v0.2.0 (nothing changed there)
+
+Line numbers from forge-core `master` as read on 2026-10-31.
+
+1. `src/forge_core/standards/repo.py:20` - add `INVENTORY["0.2"]` (the 0.1 list; extra manifest entries such as `CHANGELOG.md`, `docs/review-checklist.md`, `testkit/*` are allowed, but listing them in the inventory is the safer choice). **Prerequisite for any sync of v0.2.0.**
+2. `src/forge_core/standards/excerpt.py:57-63` (`profile_line`) - render `review.checklist_required` / `_recommended` (e.g. "review checklist REQ G27_entry_points,G28_fresh_evidence") so briefs carry it; `:118` owner short lines already include G27/G28 automatically (+47 tokens; re-check the 1200 cap with kritisch + several languages, `:128-131` truncates silently).
+3. `planner/prompt/prefix_v1.md:26-27` (section "Review") and `:18-22` (brief rules): add "Review-Brief nennt die Checkliste des Profils (G27: Einstiegspunkte aufzaehlen; G28: Neu-Erhebung vor jeder unumkehrbaren Aktion benennen); Coder-Brief bei kritisch/produktion verlangt den G27-Zaehltest und den G28-Race-Test". It is a versioned prefix (`_v1`): changing it likely means a new prefix version.
+4. `src/forge_core/mcp_planner.py:188-192` (`review_request` body) - add a line "answer the profile review checklist (standards_excerpt) item by item; unanswered required item = REWORK" and, for kritisch/produktion, the checklist item list from `docs/review-checklist.md`.
+5. `src/forge_core/planner/prompt.py:79` (project card "Standards-Profil ... (version)") - nothing to change functionally; the version string follows the sync. `compose.yaml:212` (`STANDARDS_TAG:-v0.1.1`) and `RUNBOOK.md:110-111` (tag, "Owner-Freigabe offen") -> v0.2.0 after tagging; `scripts/standards_export.sh` argument likewise.
+6. Tests/fixtures: new fixture `tests/fixtures/forge-standards-v0.2.0` (git archive) next to v0.1.1; `tests/test_f4d_*.py`, `test_f4d_rework{1,2,3}.py`, `test_m54_csrf_module.py` hard-code `v0.1.1`; `test_f4d_rework3.py:45` expects the 0.2.0 rejection - it must flip to "accepted" once the 0.2 line exists; `test_f4d_rework2.py:55` iterates `INVENTORY["0.1"]`.
+7. forge-core's own G27/G28 adoption (separate slice): copy `testkit/g27_entrypoints.py` as the entry-point count test over `dispatch.dispatch` / `graph/publication.py` (`run_dispatch`, `resolve_publication`) / `service.py` (the `customer_data`/`review_of_run_id` parameters are optional - exactly what G27 item 4 flags; see `service.py:34-45`) / `mcpsrv.py`, and use `g28_race.py` for retry/abort paths. Expect findings; not assessed here.
