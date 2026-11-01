@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from g27_entrypoints import assert_fail_closed, check_entry_points, find_entry_points  # noqa: E402
+from g27_entrypoints import DROP, EntryCase, assert_fail_closed, assert_guard_failures_rejected, check_entry_points, find_entry_points  # noqa: E402
 from g28_race import EvidenceLog, Interleaver, all_schedules, assert_observed_before, hook_after, run_schedule  # noqa: E402
 
 GOOD = '''
@@ -39,7 +39,7 @@ def tree(src: str) -> Path:
     return d
 
 
-KW = dict(verbs=("register", "publish", "execute", "release"), guarded=("guarded_dispatch",), guard_params=("session", "budget"), exempt={})
+KW = dict(verbs=("register", "publish", "execute", "release"), guarded=("guarded_dispatch",), guard_params=("session", "budget"), effect_calls=(), exempt={})
 
 
 class G27(unittest.TestCase):
@@ -92,6 +92,146 @@ class G27(unittest.TestCase):
         assert_fail_closed(closed, args, ["session", "budget"], rejects=(PermissionError, TypeError), side_effects=lambda: len(effects))
         with self.assertRaises(AssertionError):
             assert_fail_closed(open_, args, ["session", "budget"], rejects=(PermissionError,), side_effects=lambda: len(effects))
+
+
+class Dominance(unittest.TestCase):
+    """Static check: the guard must be on EVERY path, not merely somewhere in the call graph (reviewer finding)."""
+
+    def verdict(self, body: str, *, effects=(), count=1):
+        src = "def guard(): pass\ndef send(x): pass\n\n" + textwrap.dedent(body)
+        return check_entry_points(tree(src), verbs=("publish",), guarded=("guard",), expected_count=count, exempt={}, guard_params=(), effect_calls=effects)
+
+    def bad(self, body, **kw):
+        r = self.verdict(body, **kw)
+        self.assertFalse(r.ok, "bypass was accepted:\n" + body)
+        self.assertEqual([e.name for e in r.unguarded], ["publish"], r.render())
+
+    def good(self, body, **kw):
+        r = self.verdict(body, **kw)
+        self.assertTrue(r.ok, r.render())
+
+    def test_reviewer_conditional_bypass_fails(self):
+        self.bad("""
+            def publish(data, trusted):
+                if trusted:
+                    return data
+                return guard()
+        """)
+
+    def test_bypass_variants_fail(self):
+        for body in [
+            "def publish(d):\n    return d\n",                                                              # no guard at all
+            "def publish(d, t):\n    if t:\n        guard()\n    return d\n",                                # guard in one branch only
+            "def publish(d):\n    if d:\n        return d\n    guard()\n    return d\n",                  # early return before the guard
+            "def publish(d):\n    try:\n        guard()\n    except Exception:\n        pass\n    return d\n",      # swallowed failure
+            "def publish(d, t):\n    t and guard()\n    return d\n",                                      # short-circuit
+            "def publish(d, t):\n    x = guard() if t else None\n    return d\n",                         # conditional expression
+            "def publish(d):\n    f = lambda: guard()\n    return d\n",                                  # never called
+            "def publish(d):\n    for _ in d:\n        guard()\n    return d\n",                         # loop may run zero times
+            "def publish(d):\n    while d:\n        guard()\n        break\n    return d\n",
+            "def publish(d):\n    for x in d:\n        if x:\n            break\n    else:\n        guard()\n    return d\n",   # break skips the else
+            "def publish(d):\n    [guard() for _ in d]\n    return d\n",                                  # comprehension may be empty
+        ]:
+            self.bad(body)
+
+    def test_falls_off_the_end(self):
+        self.bad("def publish(d, t):\n    if t:\n        guard()\n")
+
+    def test_helper_must_be_guarded_on_all_paths_too(self):
+        self.bad("def _h(d, t):\n    if t:\n        return d\n    return guard()\n\ndef publish(d, t):\n    return _h(d, t)\n")
+
+    def test_effect_before_guard_fails(self):
+        self.bad("def publish(d):\n    send(d)\n    guard()\n", effects=("send",))
+        self.bad("def publish(d, t):\n    if t:\n        send(d)\n    guard()\n", effects=("send",))
+
+    def test_good_shapes_pass(self):
+        for body in [
+            "def publish(d):\n    guard()\n    return d\n",
+            "def publish(d, t):\n    if t:\n        return guard()\n    return guard()\n",                    # guard in both branches
+            "def publish(d, t):\n    if t:\n        guard()\n    else:\n        guard()\n    return d\n",
+            "def publish(d, t):\n    if not t:\n        raise PermissionError('no')\n    guard()\n    return d\n",   # rejecting branch
+            "def publish(d):\n    try:\n        guard()\n    except ValueError:\n        raise\n    return d\n",
+            "def publish(d):\n    with open('x') as f:\n        guard()\n    return d\n",
+            "def publish(d):\n    try:\n        pass\n    finally:\n        guard()\n    return d\n",
+            "def _h(d):\n    return guard()\n\ndef publish(d):\n    return _h(d)\n",
+            "def publish(d):\n    return send(guard() or d)\n",
+            "def publish(d):\n    guard()\n    send(d)\n",
+        ]:
+            self.good(body, effects=("send",))
+
+    def test_guard_after_effect_in_same_helper_chain_is_reported_with_line(self):
+        r = self.verdict("def publish(d, t):\n    if t:\n        return d\n    return guard()\n")
+        self.assertTrue(any("return without a guard" in x for x in r.reasons["pkg.m.publish"]), r.render())
+
+    def test_effect_calls_argument_is_required(self):
+        with self.assertRaises(TypeError):
+            check_entry_points(tree(GOOD), expected_count=2, verbs=("register",), guarded=("guarded_dispatch",), guard_params=(), exempt={})
+
+
+class Rejected(Exception):
+    pass
+
+
+class Behavioural(unittest.TestCase):
+    """Behavioural half of G27, including the case static analysis cannot see."""
+
+    def setUp(self):
+        self.effects = []
+
+        def guard(session, budget):
+            if session is None or budget <= 0:
+                raise Rejected()
+
+        def safe_publish(*, session, budget):
+            guard(session, budget)
+            self.effects.append(1)
+
+        def leaky_publish(*, session, budget, trusted=False):      # the reviewer's shape, wired so that data decides
+            if not trusted:
+                guard(session, budget)
+            self.effects.append(1)
+        self.safe, self.leaky = safe_publish, leaky_publish
+        d = tree(GOOD)
+        self.rep = check_entry_points(d, verbs=("publish",), guarded=("guarded_dispatch",), expected_count=1, exempt={}, guard_params=(), effect_calls=())
+        self.q = self.rep.entry_points[0].qualname
+        self.failing = {"no session": {"session": None}, "no budget": {"budget": 0}, "dropped session": {"session": DROP}}
+
+    def run_cases(self, fn, valid=None, failing=None, **kw):
+        valid = valid or dict(session="s", budget=5)
+        assert_guard_failures_rejected({self.q: EntryCase(fn, valid, failing if failing is not None else self.failing)}, report=self.rep,
+                                       rejects=(Rejected, TypeError), side_effects=lambda: len(self.effects), **kw)
+
+    def test_safe_entry_passes(self):
+        self.run_cases(self.safe)
+
+    def test_bypass_by_data_is_caught(self):
+        with self.assertRaises(AssertionError) as c:
+            self.run_cases(self.leaky, valid=dict(session="s", budget=5, trusted=True), failing={"no session": {"session": None}})
+        self.assertIn("ACCEPTED", str(c.exception))
+
+    def test_effect_before_rejection_is_caught(self):
+        def effect_first(*, session, budget):
+            self.effects.append(1)
+            if session is None:
+                raise Rejected()
+        with self.assertRaises(AssertionError) as c:
+            self.run_cases(effect_first, failing={"no session": {"session": None}})
+        self.assertIn("side effect", str(c.exception))
+
+    def test_uncovered_entry_point_fails(self):
+        with self.assertRaises(AssertionError) as c:
+            assert_guard_failures_rejected({}, report=self.rep, rejects=(Rejected,), side_effects=lambda: 0)
+        self.assertIn("missing", str(c.exception))
+
+    def test_case_without_failing_input_or_with_noop_override_fails(self):
+        with self.assertRaises(AssertionError):
+            self.run_cases(self.safe, failing={})
+        with self.assertRaises(AssertionError):
+            self.run_cases(self.safe, failing={"noop": {"session": "s"}})
+
+    def test_invalid_valid_input_fails(self):
+        with self.assertRaises(Rejected):
+            self.run_cases(self.safe, valid=dict(session=None, budget=5))
 
 
 class Store:

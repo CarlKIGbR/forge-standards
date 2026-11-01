@@ -10,6 +10,7 @@
   `standard`: recommended; `spike`: none. Item texts: `docs/review-checklist.md`.
 - **testkit/**: stdlib-only Python helpers `g27_entrypoints.py` (entry-point enumeration, guarded-path proof, fail-closed check), `g28_race.py` (hook/park interleaver,
   cooperative schedules, evidence log) with docs and a self-test.
+- Rework after review (still v0.2.0, untagged): `check_entry_points` now requires the guard to dominate every return/end of the entry function on every path (was: any guard call in the call graph), gains the required `effect_calls` argument; new behavioural helper `assert_guard_failures_rejected`; docs state that the static check is necessary, not sufficient; checklist item G27 #6 asks for the behavioural test.
 - `manifest.yaml` lists the new files. **Needs forge-core with a `0.2` inventory line** (`INVENTORY` in `forge_core/standards/repo.py`) before this tag can be validated or synced.
 
 ## v0.1.1

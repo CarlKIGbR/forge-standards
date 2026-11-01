@@ -9,7 +9,8 @@ blocking finding; an unanswered **recommended** item is a non-blocking finding. 
 2. Name the **one guarded function** they all pass through, and the checks it carries: customer data, model locks, handle/session, budget (say which apply).
 3. For each entry point: where does it reach the guarded function? An entry point without that path, or exempted, needs a written reason.
 4. List every **optional parameter** on those functions whose absence could skip a check (a default `None`, `skip_*`, `force`, `bypass`). There must be none; missing state must reject (fail closed).
-5. Point to the **counting test** (`testkit/g27_entrypoints.py` or equivalent) and confirm it fails when a new entry point bypasses the guard (name the mutation or the failing run that proves it).
+5. Point to the **counting test** (`testkit/g27_entrypoints.py` or equivalent) and confirm it fails when a new entry point bypasses the guard, **on any path, including a conditional one** (`if trusted: return data`) - name the mutation or the failing run that proves it.
+6. Point to the **behavioural test** (`assert_guard_failures_rejected` or equivalent): every counted entry point is invoked with input that fails each check (customer data, model lock, handle/session, budget) and must be rejected without side effect. A static check alone is not sufficient and does not answer this item.
 
 ## G28_fresh_evidence — fresh evidence before irreversible decisions (owner principle G28)
 
