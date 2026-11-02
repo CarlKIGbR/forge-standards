@@ -1,6 +1,6 @@
 # Test duties (STANDARDS spec section 3), identical for all projects; the profile decides from which level a duty applies.
 schema: forge-standards/testing/v1
-version: "0.2.0"
+version: "0.2.1"
 status: proposed
 name: testing
 levels:

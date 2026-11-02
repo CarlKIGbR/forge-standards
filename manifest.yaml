@@ -1,6 +1,6 @@
 # Every file that must exist at a tag. Validation fails (before any write) when one is missing. The manifest itself is implied.
 schema: forge-standards/manifest/v1
-version: "0.2.0"
+version: "0.2.1"
 status: proposed
 required_files:
   - CHANGELOG.md

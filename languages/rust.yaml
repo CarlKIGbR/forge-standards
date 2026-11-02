@@ -1,6 +1,6 @@
 # Layer 2 - language "rust" (optional; STANDARDS spec section 4).
 schema: forge-standards/language/v1
-version: "0.2.0"
+version: "0.2.1"
 status: proposed
 name: rust
 display: "Rust (optional)"

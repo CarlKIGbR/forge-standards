@@ -1,6 +1,6 @@
 # Owner principles (layer 0)
 
-Version 0.2.0 · status: proposed · generated from `grundsaetze.yaml`, do not edit by hand.
+Version 0.2.1 · status: proposed · generated from `grundsaetze.yaml`, do not edit by hand.
 
 ## G1 — Proof, not claims; unread stays unread
 

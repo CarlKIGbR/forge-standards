@@ -1,6 +1,6 @@
 # Layer 1 - profile "standard" (STANDARDS spec section 5).
 schema: forge-standards/profile/v1
-version: "0.2.0"
+version: "0.2.1"
 status: proposed
 name: standard
 use: "Internal tools, not operated permanently."
@@ -17,6 +17,7 @@ review:
   effort: medium
   when: every_pr
   judge: {mode: none, model: null, effort: null}
+  round_budget: 2                                    # ADR-016: Review-/Nacharbeitsrunden je Meilenstein (Graph liest core.profiles)
   checklist_required: []
   checklist_recommended: [G27_entry_points, G28_fresh_evidence]
   external_second_round: false

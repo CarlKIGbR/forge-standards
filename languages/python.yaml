@@ -1,6 +1,6 @@
 # Layer 2 - language "python" (STANDARDS spec section 4). Open question 4 default applied: mypy --strict, pyright only on demand.
 schema: forge-standards/language/v1
-version: "0.2.0"
+version: "0.2.1"
 status: proposed
 name: python
 display: "Python >= 3.12"

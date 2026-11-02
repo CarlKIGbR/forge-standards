@@ -153,6 +153,7 @@
         "effort",
         "when",
         "judge",
+        "round_budget",
         "external_second_round",
         "checklist_required",
         "checklist_recommended"
@@ -241,6 +242,11 @@
               ]
             }
           }
+        },
+        "round_budget": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
         },
         "external_second_round": {
           "type": "boolean",

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.1 - 2026-11-02 (proposed)
+
+- **Profiles**: new required key `review.round_budget` (integer 1..5; schema `profile.schema.json`): the ADR-016 round budget per milestone - spike 1, standard 2, produktion 3, kritisch 3.
+  forge-core mirrors it with the profile into `core.profiles.spec`; the run graph (F5c part 2, slice S3a) reads it from there - `config/graph.yaml` carries no round numbers.
+- Same inventory as v0.2.0 (minor line 0.2): no forge-core inventory change needed. A forge-core before S3a ignores the key; a sync of v0.2.1 into a database is what makes the graph able to start milestones (a profile without the key is refused by the graph, fail closed).
+
 ## v0.2.0 - 2026-10-31 (proposed)
 
 - **Owner principles G27, G28** (Owner-Freigabe 2026-10-31; sources F5c part 1, S2a, forge-node N1). Cap raised from <=25 to <=30 principles

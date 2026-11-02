@@ -1,6 +1,6 @@
 # Layer 2 - rules for all languages (STANDARDS spec section 4, bullet list). Open question 5 default applied: Conventional Commits in English for all repos, old history stays.
 schema: forge-standards/language/v1
-version: "0.2.0"
+version: "0.2.1"
 status: proposed
 name: common
 display: "All languages"

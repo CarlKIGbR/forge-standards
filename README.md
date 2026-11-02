@@ -3,7 +3,7 @@
 Declarative, versioned standards and coding profiles for the AI Forge. Git is canonical; the Forge database (`core.standards`, `core.profiles`) and
 the memory (`mem.documents`, `source_kind = standard`) are read copies written by `python -m forge_core.standards sync`.
 
-**Status of this release: `v0.2.0` — `proposed`. G27/G28 are owner-approved (Owner-Freigabe 2026-10-31); approval of the release as a whole is pending.** Every file carries `status: proposed`. Values that the source specification
+**Status of this release: `v0.2.1` — `proposed`. G27/G28 are owner-approved (Owner-Freigabe 2026-10-31); approval of the release as a whole is pending.** Every file carries `status: proposed`. Values that the source specification
 marks as `ANNAHME` (assumption) are applied as written and listed per profile under `assumptions:`; they are to be confirmed or corrected by the owner.
 
 ## Layers (precedence top to bottom)
